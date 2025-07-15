@@ -95,7 +95,7 @@ A RESTful API built using Node.js, Express, and PostgreSQL to manage events and 
     {
       "id": 1,
       "name": "Harman Singh",
-      "email": "harman@example.com"
+      "email": "harman@gmail.com"
     }
   ]
 }
