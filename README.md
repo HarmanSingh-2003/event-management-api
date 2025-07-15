@@ -6,88 +6,85 @@ A RESTful API built using Node.js, Express, and PostgreSQL to manage events and 
 
 ## 📦 Setup Instructions
 
-1. **Clone the repository**
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/HarmanSingh-2003/event-management-api.git
    cd event-management-api
-Install dependencies
+   
+2. **Install dependencies:**
+   ```bash
+   npm install
 
-bash
-Copy
-Edit
-npm install
-Create a .env file and add:
+3. **Create a .env file and add:**
+   ```env
+   PORT=3000
+   DATABASE_URL=postgresql://your_user:your_password@localhost:5432/eventdb
 
-env
-Copy
-Edit
-PORT=3000
-DATABASE_URL=postgresql://your_user:your_password@localhost:5432/eventdb
-Create the PostgreSQL tables
+4. **Create the PostgreSQL tables:**
+   ```sql
+   CREATE TABLE users (
+   id SERIAL PRIMARY KEY,
+   name VARCHAR(100) NOT NULL,
+   email VARCHAR(100) UNIQUE NOT NULL
+   );
+   
+   CREATE TABLE events (
+   id SERIAL PRIMARY KEY,
+   title VARCHAR(255) NOT NULL,
+   datetime TIMESTAMP NOT NULL,
+   location VARCHAR(100),
+   capacity INTEGER CHECK (capacity > 0 AND capacity <= 1000)
+   );
 
-sql
-Copy
-Edit
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  email VARCHAR(100) UNIQUE NOT NULL
-);
+   CREATE TABLE registrations (
+   user_id INTEGER REFERENCES users(id),
+   event_id INTEGER REFERENCES events(id),
+   PRIMARY KEY (user_id, event_id)
+   );
 
-CREATE TABLE events (
-  id SERIAL PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  datetime TIMESTAMP NOT NULL,
-  location VARCHAR(100),
-  capacity INTEGER CHECK (capacity > 0 AND capacity <= 1000)
-);
+5. **Start the server:**
+   ```bash
+   npx nodemon app.js
 
-CREATE TABLE registrations (
-  user_id INTEGER REFERENCES users(id),
-  event_id INTEGER REFERENCES events(id),
-  PRIMARY KEY (user_id, event_id)
-);
-Start the server
+## 📘 API Description
 
-bash
-Copy
-Edit
-npx nodemon app.js
-Server will run at: http://localhost:3000
+| Method | Endpoint                | Description                                    |
+|--------|-------------------------|------------------------------------------------|
+| POST   | `/events`              | Create a new event                             |
+| GET    | `/events/:id`          | Get event details including registered users   |
+| POST   | `/events/:id/register` | Register a user for an event                   |
+| DELETE | `/events/:id/cancel`   | Cancel a user’s registration                   |
+| GET    | `/events/upcoming/list`| List all upcoming events                       |
+| GET    | `/events/:id/stats`    | Get event statistics                           |
 
-📌 API Endpoints
-1. Create Event
-POST /events
-Creates a new event. Capacity must be between 1 and 1000.
+## 📥 Example Requests/Responses
 
-Request Body:
+### a. Create Event
 
-json
-Copy
-Edit
+**`POST /events`**
+
+**Request Body:**
+```json
 {
   "title": "Tech Talk",
   "datetime": "2025-08-01T10:00:00",
   "location": "Delhi",
   "capacity": 100
 }
-Response:
-
-json
-Copy
-Edit
+```
+**Response:**
+```json
 {
   "eventId": 1
 }
-2. Get Event Details
-GET /events/:id
-Returns all event details including registered users.
+```
 
-Response:
+### b. Get Event Details
 
-json
-Copy
-Edit
+**`GET /events/:id`**
+
+**Response:**
+```json
 {
   "id": 1,
   "title": "Tech Talk",
@@ -102,55 +99,47 @@ Edit
     }
   ]
 }
-3. Register for Event
-POST /events/:id/register
-Registers a user. Prevents duplicate, full, or past registrations.
+```
+### c. Register for Event
 
-Request Body:
+**`POST /events/:id/register`**
 
-json
-Copy
-Edit
+**Request Body:**
+```json
 {
   "userId": 1
 }
-Response:
-
-json
-Copy
-Edit
+```
+**Response:**
+```json
 {
   "message": "User registered successfully."
 }
-4. Cancel Registration
-DELETE /events/:id/cancel
-Cancels a user's registration.
+```
 
-Request Body:
+### d. Cancel Registration
 
-json
-Copy
-Edit
+**`DELETE /events/:id/cancel`**
+
+**Request Body:**
+```json
 {
   "userId": 1
 }
-Response:
-
-json
-Copy
-Edit
+```
+**Response:**
+```json
 {
   "message": "Registration cancelled successfully"
 }
-5. List Upcoming Events
-GET /events/upcoming/list
-Returns all future events sorted by date and location.
+```
 
-Response:
+### e. List Upcoming Events
 
-json
-Copy
-Edit
+**`GET  /events/upcoming/list`**
+
+**Response:**
+```json
 {
   "upcomingEvents": [
     {
@@ -162,17 +151,18 @@ Edit
     }
   ]
 }
-6. Event Stats
-GET /events/:id/stats
-Returns total registrations, remaining capacity, and percentage used.
+```
 
-Response:
+### f. Event Stats
 
-json
-Copy
-Edit
+**`GET  /events/:id/stats`**
+
+**Response:**
+```json
 {
   "totalRegistrations": 1,
   "remainingCapacity": 99,
   "percentageUsed": "1.00%"
 }
+```
+
